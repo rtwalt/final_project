@@ -9,4 +9,6 @@ try:
 	cache_file1.close()
 except:
 	CACHE_DICTION1 = {}
-  
+
+def make_request():
+	pass
