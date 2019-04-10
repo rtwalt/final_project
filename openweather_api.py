@@ -11,4 +11,10 @@ except:
 	CACHE_DICTION1 = {}
 
 def make_request():
-	pass
+	response = requests.get("http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=836d82e650676a734c1f9fe9449f3beb")
+	data = response.json()
+	print(data)
+
+make_request()
+
+
