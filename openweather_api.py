@@ -34,29 +34,28 @@ def make_request(city):
 	key = api_ow_info.og_api
 	url = "http://api.openweathermap.org/data/2.5/weather?"
 	#data = {"q": city, "id": "524901", "APPID":"836d82e650676a734c1f9fe9449f3beb"}
-	response = make_requests_with_caching(url, ident=ident, key = key)
+	response = make_requests_with_caching(url, ident = ident, key = key)
 	data = json.loads(response)
 	return data
 
-miami = make_request("Ohio")
-print(miami)
+# miami = make_request("Miami")
+# newyork = make_request("New York")
+# la = make_request("Los Angeles")
+# Austin = make_request("Austin")
+# aa = make_request("Ann Arbor")
 
-# def get_temp(city):
-# 	city_info = make_request(city)
-# 	list1 = city_info["list"]
-# 	#for l in list1:
-# 		#l[]
-# 	return list1
+
+def city_info(city):
+	fn = 'cache-openweather.json'
+	with open(fn, 'r') as f:
+		data = json.loads(f)
+	city = make_request(city)
+	list1 = city_info["list"]
+	for l in list1:
 
 # def average_temp(city):
 # 	#city_info = 
 # 	pass
-
-# miami = make_request("miami")
-#new_york = make_request("new york")
-#los_angeles = make_request("los angeles")
-
-#miami id is "524901"
 
 
 
