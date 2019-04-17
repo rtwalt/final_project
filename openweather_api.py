@@ -21,6 +21,7 @@ def make_requests_with_caching(url, ident, key):
 		f = open('cache-openweather.json', 'w')
 		f = f.write(JSONdumps)
 		f.close()
+	return CACHE_DICTION[ident]
 
 def make_request(city):
 	#q = city name or get city id
@@ -37,7 +38,7 @@ def make_request(city):
 	data = json.loads(response)
 	return data
 
-miami = make_request("Miami")
+miami = make_request("Ohio")
 print(miami)
 
 # def get_temp(city):
