@@ -2,41 +2,21 @@ import requests
 import json
 import secrets
 import api_ow_info
+import sqlite3
 
-def make_requests_with_caching(url, ident, key):
-	#or params['q']
-	try:
-		cache_file = open('cache-openweather.json', 'r')
-		cache_contents = cache_file.read()
-		CACHE_DICTION = json.loads(cache_contents)
-		cache_file.close()
-	except:
-		CACHE_DICTION = {}
-	if ident in CACHE_DICTION:
-		return CACHE_DICTION[ident]
-	else:
-		response = requests.get(url + "q=" + ident + "&APPID=" + key)
-		CACHE_DICTION[ident] = response.text
-		JSONdumps = json.dumps(CACHE_DICTION)
-		f = open('cache-openweather.json', 'w')
-		f = f.write(JSONdumps)
-		f.close()
-	return CACHE_DICTION[ident]
 
 def make_request(city):
-	#q = city name or get city id
-	#response = requests.get("http://api.openweathermap.org/data/2.5/forecast?q=miami&id=524901&APPID=836d82e650676a734c1f9fe9449f3beb")
-	#params = {}
-	#params['q'] = city
-	ident = city
-	#params['id'] = id_
-	#params['APPID'] = api_ow_info.og_api
 	key = api_ow_info.og_api
 	url = "http://api.openweathermap.org/data/2.5/weather?"
-	#data = {"q": city, "id": "524901", "APPID":"836d82e650676a734c1f9fe9449f3beb"}
-	response = make_requests_with_caching(url, ident = ident, key = key)
-	data = json.loads(response)
-	return data
+	response = requests.get(url + "q=" + city + "&units=imperial" + "&appid=" + key)
+	new = json.loads(response.text)
+
+	# if city not in "openweather.txt":
+	# 	with open("openweather.txt", 'w') as fd:
+	# 		fd.write(response.text)
+	# 		fd.close()
+
+	return new
 
 # miami = make_request("Miami")
 # newyork = make_request("New York")
@@ -45,21 +25,82 @@ def make_request(city):
 # aa = make_request("Ann Arbor")
 
 
-def city_info(city):
-	fn = 'cache-openweather.json'
-	with open(fn, 'r') as f:
-		data = json.loads(f)
-	city = make_request(city)
-	list1 = city_info["list"]
-	for l in list1:
+def city_info():
 
-# def average_temp(city):
-# 	#city_info = 
-# 	pass
+	city = input_city()
+	data = make_request(city)
+	#print(data.keys())
+	new_dict = {}
+	new_dict['city'] = city	
+	new_dict['temp'] = data['main']["temp"]
+	new_dict['humidity'] = data['main']['humidity']
+	#new_dict['temp_min'] = data['main']['temp_min']
+	#new_dict['temp_max'] = data['main']['temp_max']
+	new_dict['wind_speed'] = data['wind']['speed']
+	for i in data['weather']:
+		new_dict['clouds'] = i['description']
+	
+	print(new_dict)
+	return new_dict
+	
 
+	# new_dict['clouds'] = city_info[city]['clouds']
+	# new_dict['longitude'] = city_info[city]['coord']['lon']
+	# new_dict['latitude'] = city_info[city]['coord']['lat']
+	#for i in data['weather']: THIS
+		#for k in i: THIS
+			#print(i[k])
+			# if k == 'id':
+			# 	new_dict['weather_id'] = i[k]
+			# if k == 'sky':
+			# 	new_dict['clouds'] = i[k]
+			# if k == 'description': THIS
+			# 	new_dict['clouds_description'] = i[k] THIS
+			# # if k == 'icon':
+			# 	new_dict['icon'] = i[k]
+	#new_dict['pressure'] = city_info[city]['main']['pressure']
+	#new_dict['type'] = list_cities[city]['sys']['type']
+	#new_dict['id'] = list_cities[city]['sys']['id']
+	#new_dict['message'] = list_cities[city]['sys']['message']
+	#new_dict['country'] = list_cities[city]['sys']['country']
+	# new_dict['sunrise'] = city['sys']['sunrise']
+	# new_dict['sunset'] = city['sys']['sunset']
+	
+		
+def input_city():
+	user = input("Please enter a city name")
+	return user
 
+#print(city_info())
 
+def openweather_db():
 
+	try:
+		city_weather = city_info()
+	
+		conn = sqlite3.connect('openweather.db')
+		cur = conn.cursor()
+		cur.execute('CREATE TABLE IF NOT EXISTS Weather(city TEXT, temp REAL, humidity INTEGER , wind_speed REAL, clouds TEXT)')
 
+		city = city_weather['city']
+		temp = city_weather['temp']
+		humidity = city_weather['humidity']
+		wind_speed = city_weather['wind_speed']
+		clouds = city_weather['clouds']
+		cur.execute('INSERT INTO Weather (city, temp, humidity, wind_speed, clouds) VALUES (?, ?, ?, ?, ?)',
+                	(city, temp, humidity, wind_speed, clouds))
+	
+		conn.commit()
+	
+	except:
+		return "not a valid city"
 
+def main():
+	for i in range(19):
+		print(openweather_db())
 
+main()
+
+def average_temp(): #calculate this info from the data- most, average, whatever from data set
+	pass
+	
